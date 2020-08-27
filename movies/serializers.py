@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Movie, Review
+from .models import Movie, Review, Rating
 
 class FilterReviewListSerializer(serializers.Serializer):
     def to_representation(self, data):
@@ -36,8 +36,21 @@ class MovieDetailSerializer(serializers.ModelSerializer):
     directors = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
     actors = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
     genre = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
-    reviews = ReviewListSerializer(many=True)
+    reviews = ReviewSerializer(many=True)
 
     class Meta:
         model = Movie
         exclude = ("draft",)
+
+class CreateRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ("star", "movie")
+
+    def create(self, validated_data):
+        rating = Rating.objects.update_or_create(
+            ip=validated_data.get('ip', None),
+            movie=validated_data.get('movie', None),
+            defaults={'star': validated_data.get('star')}
+        )
+        return rating
