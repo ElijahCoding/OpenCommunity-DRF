@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -14,6 +14,7 @@ class MovieListView(generics.ListAPIView):
     serializer_class = MovieListSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = MovieFilter
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         # movies = Movie.objects.filter(draft=False).annotate(
@@ -26,7 +27,7 @@ class MovieListView(generics.ListAPIView):
         movies = Movie.objects.filter(draft=False).annotate(
             rating_user=models.Count('ratings', filter=models.Q(ratings__ip=get_client_ip(self.request)))
         ).annotate(
-            middle_star=models.Sum(models.F('rating__star')) / models.Count(models.F('ratings'))
+            middle_star=models.Sum(models.F('ratings__star')) / models.Count(models.F('ratings'))
         )
         return movies
 
