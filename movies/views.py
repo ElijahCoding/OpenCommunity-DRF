@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, viewsets
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .service import get_client_ip, MovieFilter
+from .service import get_client_ip, MovieFilter, PaginationMovies
 
 from .models import Movie, Actor
 from .serializers import (
@@ -13,6 +13,7 @@ from .serializers import (
 class MovieViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_class = MovieFilter
+    pagination_class = PaginationMovies
 
     def get_queryset(self):
         movies = Movie.objects.filter(draft=False).annotate(
