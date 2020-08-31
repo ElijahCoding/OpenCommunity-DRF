@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 
 from .models import Actor
@@ -15,3 +16,12 @@ class ActorViewSet(viewsets.ViewSet):
         queryset = Actor.objects.all()
         actor = get_object_or_404(queryset, pk=pk)
         serializer = ActorDetailSerializer(actor)
+        return Response(serializer.data)
+
+class ActorReadOnly(viewsets.ReadOnlyModelViewSet):
+    queryset = Actor.objects.all()
+    serializer_class = ActorListSerializer
+
+class ActorModelViewSet(viewsets.ModelViewSet):
+    serializer_class = ActorListSerializer
+    queryset = Actor.objects.all()
